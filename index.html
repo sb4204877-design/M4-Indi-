@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trading Platform Selector</title>
+    <style>
+        body {
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+        .frame {
+            background: #0a0a0a;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: none;
+            border: none;
+            border-radius: 0;
+        }
+        
+        /* Platform Selection Modal */
+        .platform-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal-title {
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .platform-options {
+            display: flex;
+            gap: 40px;
+            margin-top: 20px;
+        }
+        .platform-option {
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            width: 180px;
+        }
+        .platform-option:hover {
+            border-color: #3b82f6;
+            transform: translateY(-5px);
+        }
+        .platform-option.active {
+            border-color: #3b82f6;
+            background: #151515;
+        }
+        .platform-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            border-radius: 10px;
+            object-fit: contain;
+        }
+        .platform-name {
+            color: #fff;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        /* Bottom Navigation Bar */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #1a1a1a;
+            border-top: 1px solid #333;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            color: #888;
+            transition: color 0.3s;
+            padding: 5px;
+        }
+        .nav-item:hover {
+            color: #fff;
+        }
+        .nav-item.active {
+            color: #3b82f6;
+        }
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 3px;
+        }
+        .nav-label {
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        /* Pages */
+        .page {
+            display: none;
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            margin-bottom: 60px;
+        }
+        .page.active {
+            display: block;
+        }
+        
+        /* Home Page */
+        .home-page {
+            text-align: center;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 5px 0;
+            color: #3b82f6;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+        }
+        .active-users {
+            color: #10b981;
+        }
+        .team-members {
+            color: #f59e0b;
+        }
+        .quotex-users {
+            color: #ef4444;
+        }
+        .pocket-users {
+            color: #3b82f6;
+        }
+        .analytics-chart {
+            width: 100%;
+            height: 150px;
+            margin: 25px 0;
+            position: relative;
+            background: transparent;
+        }
+        .chart-canvas {
+            width: 100%;
+            height: 100%;
+        }
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 25px;
+        }
+        .social-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .social-icon:hover {
+            transform: scale(1.15);
+        }
+        .social-icon img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+        
+        /* Gauge Page */
+        .gauge-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 20px;
+        }
+        .gauge-title {
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .currency-name {
+            color: #3b82f6;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .gauge-svg {
+            width: 90%;
+            max-width: 400px;
+            height: auto;
+        }
+        
+        /* Results Page */
+        .results-page h3 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .trade-record {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+        .trade-win {
+            border-left: 3px solid #3b82f6;
+        }
+        .trade-loss {
+            border-left: 3px solid #ef4444;
+        }
+        .trade-count-summary {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 15px;
+            background: #1a1a1a;
+            border-radius: 8px;
+        }
+        .summary-item {
+            text-align: center;
+        }
+        .summary-number {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .summary-label {
+            font-size: 11px;
+            color: #888;
+        }
+        
+        /* Support Page */
+        .support-page {
+            text-align: center;
+            color: #fff;
+        }
+        .support-page p {
+            color: #888;
+            margin: 10px 0;
+        }
+        .support-email {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="frame">
+        <!-- Platform Selection Modal -->
+        <div id="platformModal" class="platform-modal">
+            <div class="modal-title">Select Your Trading Platform</div>
+            <div class="platform-options">
+                <div class="platform-option" onclick="selectPlatform('quotex')">
+                    <img src="https://placehold.co/80x80/ff4444/ffffff?text=Quotex" alt="Quotex" class="platform-logo">
+                    <div class="platform-name">Quotex</div>
+                </div>
+                <div class="platform-option" onclick="selectPlatform('pocket')">
+                    <img src="https://placehold.co/80x80/3b82f6/ffffff?text=Pocket" alt="Pocket Option" class="platform-logo">
+                    <div class="platform-name">Pocket Option</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Home Page (Default - Leftmost) -->
+        <div id="homePage" class="page">
+            <div class="home-page">
+                <h3 style="color: #fff; margin: 10px 0;">Trading Dashboard</h3>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Users</div>
+                        <div class="stat-value">12,547</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Active Users</div>
+                        <div class="stat-value active-users">4,823</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Team Members</div>
+                        <div class="stat-value team-members">5</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Quotex Users</div>
+                        <div class="stat-value quotex-users">7,234</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Pocket Users</div>
+                        <div class="stat-value pocket-users">5,313</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Success Rate</div>
+                        <div class="stat-value" style="color: #10b981;">78.5%</div>
+                    </div>
+                </div>
+                
+                <div class="analytics-chart" id="analyticsChart"></div>
+                
+                <div class="social-icons">
+                    <div class="social-icon tiktok" title="TikTok">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/TikTok_logo.svg" alt="TikTok">
+                    </div>
+                    <div class="social-icon instagram" title="Instagram">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" alt="Instagram">
+                    </div>
+                    <div class="social-icon telegram" title="Telegram">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gauge Page -->
+        <div id="gaugePage" class="page">
+            <div class="gauge-container">
+                <div class="gauge-title">Market Sentiment</div>
+                <div class="currency-name">EUR/USD</div>
+                <svg class="gauge-svg" viewBox="0 0 400 280" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="arcGradient" x1="0%" y1="0%" x2="100%" x2="0%">
+                            <stop offset="0%" stop-color="#ef4444" />
+                            <stop offset="50%" stop-color="#6b7280" />
+                            <stop offset="100%" stop-color="#3b82f6" />
+                        </linearGradient>
+                        <linearGradient id="needleGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+                            <stop offset="100%" stop-color="#e0e0e0" stop-opacity="0.7"/>
+                        </linearGradient>
+                    </defs>
+
+                    <path d="M 50 200 A 150 150 0 0 1 350 200" 
+                          fill="none" stroke="url(#arcGradient)" stroke-width="16" stroke-linecap="round"/>
+
+                    <circle cx="200" cy="200" r="10" fill="#ffffff" stroke="#333" stroke-width="2"/>
+
+                    <polygon points="200,200 198,110 200,100 202,110 200,200" 
+                             fill="url(#needleGradient)" stroke="#fff" stroke-width="0.5"/>
+
+                    <!-- LEFT SIDE: SELL -->
+                    <text x="45" y="225" font-size="12" fill="#ef4444" text-anchor="middle" font-weight="bold">STRONG SELL</text>
+                    <text x="45" y="105" font-size="12" fill="#ef4444" text-anchor="middle" font-weight="bold">SELL</text>
+                    
+                    <!-- CENTER: NEUTRAL -->
+                    <text x="200" y="25" font-size="12" fill="#6b7280" text-anchor="middle" font-weight="bold">NEUTRAL</text>
+                    
+                    <!-- RIGHT SIDE: BUY -->
+                    <text x="355" y="105" font-size="12" fill="#3b82f6" text-anchor="middle" font-weight="bold">BUY</text>
+                    <text x="355" y="225" font-size="12" fill="#3b82f6" text-anchor="middle" font-weight="bold">STRONG BUY</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Results Page -->
+        <div id="resultsPage" class="page">
+            <h3>Trading Results</h3>
+            <div class="trade-count-summary">
+                <div class="summary-item">
+                    <div class="summary-number" style="color: #3b82f6;">847</div>
+                    <div class="summary-label">WINS</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-number" style="color: #ef4444;">233</div>
+                    <div class="summary-label">LOSSES</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-number" style="color: #6b7280;">1080</div>
+                    <div class="summary-label">TOTAL</div>
+                </div>
+            </div>
+            
+            <div class="trade-record trade-win">
+                <span>EUR/USD - CALL</span>
+                <span style="color: #3b82f6;">+$145</span>
+            </div>
+            <div class="trade-record trade-loss">
+                <span>GBP/JPY - PUT</span>
+                <span style="color: #ef4444;">-$100</span>
+            </div>
+            <div class="trade-record trade-win">
+                <span>AUD/CAD - CALL</span>
+                <span style="color: #3b82f6;">+$98</span>
+            </div>
+            <div class="trade-record trade-win">
+                <span>USD/CHF - PUT</span>
+                <span style="color: #3b82f6;">+$123</span>
+            </div>
+            <div class="trade-record trade-loss">
+                <span>NZD/USD - CALL</span>
+                <span style="color: #ef4444;">-$100</span>
+            </div>
+        </div>
+
+        <!-- Support Page -->
+        <div id="supportPage" class="page">
+            <div class="support-page">
+                <h3>Support</h3>
+                <p>Contact us for assistance</p>
+                <p class="support-email">support@tradingplatform.com</p>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="nav-bar">
+            <div class="nav-item active" onclick="showPage('homePage', this)">
+                <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+                <span class="nav-label">HOME</span>
+            </div>
+            <div class="nav-item" onclick="showPage('gaugePage', this)">
+                <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                <span class="nav-label">GAUGE</span>
+            </div>
+            <div class="nav-item" onclick="showPage('resultsPage', this)">
+                <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                </svg>
+                <span class="nav-label">RESULTS</span>
+            </div>
+            <div class="nav-item" onclick="showPage('supportPage', this)">
+                <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/>
+                </svg>
+                <span class="nav-label">SUPPORT</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Platform selection
+        function selectPlatform(platform) {
+            document.getElementById('platformModal').style.display = 'none';
+            // Using sessionStorage instead of localStorage as localStorage is not supported
+            sessionStorage.setItem('selectedPlatform', platform);
+            loadAnalyticsChart();
+        }
+        
+        // Page navigation
+        function showPage(pageId, navItem) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            navItem.classList.add('active');
+        }
+        
+        // Analytics chart drawing
+        function loadAnalyticsChart() {
+            const canvas = document.getElementById('analyticsChart');
+            if (!canvas) return;
+            
+            // Create canvas element
+            const canvasEl = document.createElement('canvas');
+            canvasEl.className = 'chart-canvas';
+            canvas.innerHTML = '';
+            canvas.appendChild(canvasEl);
+            
+            const ctx = canvasEl.getContext('2d');
+            const width = canvasEl.offsetWidth;
+            const height = canvasEl.offsetHeight;
+            
+            // Set canvas dimensions
+            canvasEl.width = width;
+            canvasEl.height = height;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            // Draw gradient background
+            const gradient = ctx.createLinearGradient(0, 0, width, height);
+            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.1)');
+            gradient.addColorStop(1, 'rgba(239, 68, 68, 0.1)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+            
+            // Draw grid lines
+            ctx.strokeStyle = 'rgba(136, 136, 136, 0.3)';
+            ctx.lineWidth = 1;
+            
+            // Horizontal grid lines
+            for (let i = 1; i < 5; i++) {
+                const y = height * (i / 5);
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+            
+            // Draw analytics line with smooth curve
+            ctx.beginPath();
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 3;
+            ctx.shadowColor = '#3b82f6';
+            ctx.shadowBlur = 10;
+            
+            // Create smooth curve points
+            const points = [
+                {x: 0, y: height * 0.7},
+                {x: width * 0.15, y: height * 0.65},
+                {x: width * 0.3, y: height * 0.55},
+                {x: width * 0.45, y: height * 0.6},
+                {x: width * 0.6, y: height * 0.45},
+                {x: width * 0.75, y: height * 0.5},
+                {x: width * 0.9, y: height * 0.4},
+                {x: width, y: height * 0.35}
+            ];
+            
+            // Draw smooth curve using Catmull-Rom spline approximation
+            ctx.moveTo(points[0].x, points[0].y);
+            
+            for (let i = 1; i < points.length - 2; i++) {
+                const xc = (points[i].x + points[i + 1].x) / 2;
+                const yc = (points[i].y + points[i + 1].y) / 2;
+                ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
+            }
+            // Curve through the last two points
+            ctx.quadraticCurveTo(
+                points[points.length - 2].x,
+                points[points.length - 2].y,
+                points[points.length - 1].x,
+                points[points.length - 1].y
+            );
+            
+            ctx.stroke();
+            
+            // Draw data points
+            ctx.fillStyle = '#3b82f6';
+            ctx.shadowBlur = 15;
+            points.forEach(point => {
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            // Reset shadow
+            ctx.shadowBlur = 0;
+            
+            // Draw success rate text
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 24px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText('78.5%', width / 2, height / 2);
+            
+            // Draw chart title
+            ctx.fillStyle = '#888';
+            ctx.font = '12px Segoe UI';
+            ctx.textAlign = 'left';
+            ctx.fillText('Success Rate Trend', 10, 20);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if platform is already selected
+            const selectedPlatform = sessionStorage.getItem('selectedPlatform');
+            if (selectedPlatform) {
+                document.getElementById('platformModal').style.display = 'none';
+            }
+            
+            // Show Home page by default
+            showPage('homePage', document.querySelector('.nav-item'));
+            
+            // Load analytics chart if modal is not shown
+            setTimeout(() => {
+                if (document.getElementById('platformModal').style.display !== 'flex') {
+                    loadAnalyticsChart();
+                }
+            }, 100);
+            
+            // Handle window resize for chart
+            window.addEventListener('resize', function() {
+                if (document.getElementById('platformModal').style.display !== 'flex') {
+                    loadAnalyticsChart();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
