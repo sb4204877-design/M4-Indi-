@@ -3,80 +3,78 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Pro Signal Gauge Mobile</title>
-    <!-- استيراد الأيقونات -->
+    <title>Pro Signals & History</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* --- CSS STYLES --- */
+        /* --- CSS VARIABLES & RESET --- */
         :root {
             --primary: #3b82f6;
+            --success: #2ecc71;
+            --danger: #ef4444;
             --bg-dark: #000000;
-            --bg-card: #111111;
-            --text-gray: #9ca3af;
+            --glass: rgba(20, 20, 20, 0.95);
         }
 
         body {
             background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden; /* منع التمرير الزائد */
+            overflow: hidden;
             color: white;
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* رسالة البداية */
+        /* --- OVERLAY --- */
         #start-overlay {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            z-index: 1000;
-            font-size: 14px;
+            z-index: 2000;
+            font-size: 16px;
             color: var(--primary);
             animation: pulse 1.5s infinite;
             pointer-events: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: bold;
         }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
 
-        /* حاوية التطبيق */
         .app-container {
             width: 100%;
             height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: flex-start; /* نبدأ من الأعلى */
-            padding-top: 20px;
-            padding-bottom: 80px; /* مساحة للشريط السفلي */
+            padding-bottom: 70px; /* Space for bottom nav */
             box-sizing: border-box;
+            overflow: hidden;
         }
 
-        /* --- صفحة المؤشر (Gauge Page) --- */
+        /* --- PAGE 1: GAUGE --- */
         #gauge-page {
-            display: flex;
+            display: flex; /* Active by default */
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             width: 100%;
             height: 100%;
-            gap: 20px; /* مسافة بين العداد والايقونات */
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
         }
 
-        /* إطار العداد - متجاوب للموبايل */
         .frame {
             background: linear-gradient(145deg, #111111, #0a0a0a);
             border: 1px solid #333;
             border-radius: 20px;
-            /* عرض متجاوب */
-            width: 90vw; 
-            max-width: 500px;
-            /* الحفاظ على النسبة */
+            width: 100%; 
+            max-width: 400px;
             aspect-ratio: 4/3; 
             display: flex;
             justify-content: center;
@@ -84,97 +82,126 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.9), inset 0 1px 1px rgba(255,255,255,0.1);
             position: relative;
             transition: border-color 0.5s ease;
+            margin-bottom: 20px;
         }
 
-        .gauge-svg {
-            width: 95%; /* SVG يملأ الإطار */
-            height: auto;
-            z-index: 1;
-            filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
-        }
-
-        #needle-group {
-            transition: transform 4s cubic-bezier(0.25, 1, 0.5, 1);
-            transform-origin: 200px 200px;
-        }
-
+        .gauge-svg { width: 95%; height: auto; z-index: 1; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); }
+        #needle-group { transition: transform 4s cubic-bezier(0.25, 1, 0.5, 1); transform-origin: 200px 200px; }
         .digital-font { font-family: 'Courier New', monospace; font-weight: bold; }
 
-        /* --- Social Media Section --- */
-        .social-container {
+        /* Socials & Info */
+        .social-wrapper {
             display: flex;
-            gap: 20px;
-            margin-top: 10px;
-        }
-
-        .social-btn {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            font-size: 22px;
-            color: white;
-            text-decoration: none;
-            background: #222;
-            border: 1px solid #333;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            transition: transform 0.2s, box-shadow 0.2s;
+            gap: 15px;
+            width: 100%;
         }
-
-        .social-btn:active { transform: scale(0.9); }
+        .follow-text { font-size: 12px; color: #ccc; letter-spacing: 0.5px; }
+        .social-icons { display: flex; gap: 35px; }
+        .social-link { font-size: 28px; color: #888; transition: 0.3s; }
+        .social-link:hover { color: white; transform: scale(1.1); }
         
-        /* ألوان الأيقونات */
-        .insta { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); border: none; }
-        .tiktok { background: #000; border: 1px solid #444; text-shadow: 2px 2px 0px #25F4EE, -2px -2px 0px #FE2C55; }
-        .telegram { background: #0088cc; border: none; }
-
-        /* --- Developer Credit --- */
-        .dev-credit {
-            margin-top: auto; /* دفعها للأسفل */
-            font-size: 10px;
-            color: #555;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            font-weight: bold;
-            padding-bottom: 10px;
-        }
-        .dev-credit span { color: var(--primary); }
-
-        /* --- صفحة النتائج (History Page) --- */
-        #history-page {
-            display: none;
+        .risk-warning {
             width: 90%;
-            height: 90%;
-            background: #111;
-            border-radius: 15px;
+            text-align: center;
+            font-size: 9px;
+            color: #444;
+            line-height: 1.4;
+            margin-top: 15px;
+            border-top: 1px solid #222;
+            padding-top: 10px;
+        }
+
+        /* Developer Credit (Colored) */
+        .dev-credit {
+            margin-top: 20px;
+            font-size: 11px;
+            color: #666;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .dev-name {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        /* --- PAGE 2: HISTORY --- */
+        #history-page {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            background: #050505;
             padding: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            border: 1px solid #333;
-            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #222;
+            margin-bottom: 10px;
         }
 
         .history-title {
-            text-align: center;
             font-size: 18px;
-            margin-bottom: 15px;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Table Styles */
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+            border-radius: 8px;
+            background: #0f0f0f;
+            border: 1px solid #222;
         }
 
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 10px; text-align: center; border-bottom: 1px solid #222; font-size: 12px; }
-        th { color: var(--text-gray); font-size: 10px; text-transform: uppercase; }
-        .win { color: #4ade80; }
-        .loss { color: #f87171; }
-        .buy { color: #3b82f6; font-weight: bold; }
-        .sell { color: #ef4444; font-weight: bold; }
+        thead { background: #1a1a1a; position: sticky; top: 0; }
+        th { color: #888; font-size: 11px; text-transform: uppercase; padding: 12px 8px; text-align: center; letter-spacing: 1px; }
+        td { padding: 12px 8px; text-align: center; font-size: 13px; border-bottom: 1px solid #1a1a1a; color: #ddd; }
+        tr:nth-child(even) { background: #141414; }
+        
+        .buy-badge { color: var(--primary); font-weight: bold; background: rgba(59, 130, 246, 0.1); padding: 2px 6px; border-radius: 4px; }
+        .sell-badge { color: #ff9f43; font-weight: bold; background: rgba(255, 159, 67, 0.1); padding: 2px 6px; border-radius: 4px; }
+        .win-res { color: var(--success); font-weight: bold; }
+        .loss-res { color: var(--danger); font-weight: bold; }
 
-        /* --- الشريط السفلي --- */
+        /* Pagination Controls */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #222;
+        }
+        
+        .page-info { font-size: 12px; color: #666; }
+        
+        .btn-nav {
+            background: #222;
+            color: white;
+            border: 1px solid #333;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-nav:active { transform: scale(0.95); }
+        .btn-nav:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* --- BOTTOM NAV --- */
         .nav-bar {
             position: fixed;
             bottom: 0;
@@ -187,37 +214,34 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            z-index: 100;
-            padding-bottom: env(safe-area-inset-bottom); /* لهواتف آيفون الحديثة */
+            z-index: 1000;
         }
 
         .nav-item {
             color: #555;
-            font-size: 20px;
+            font-size: 22px;
             cursor: pointer;
-            transition: 0.3s;
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 50%;
             padding: 10px 0;
+            transition: 0.3s;
         }
-
-        .nav-item.active { color: var(--primary); }
-        .nav-label { font-size: 10px; margin-top: 5px; font-weight: 500; }
+        .nav-item.active { color: var(--primary); text-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
+        .nav-label { font-size: 10px; margin-top: 4px; font-weight: 500; }
 
     </style>
 </head>
 <body>
 
-    <div id="start-overlay">Tap anywhere to start</div>
+    <div id="start-overlay">Tap to Activate System</div>
 
     <div class="app-container">
         
-        <!-- PAGE 1: GAUGE -->
+        <!-- === PAGE 1: GAUGE === -->
         <div id="gauge-page">
             
-            <!-- 3D Frame -->
             <div class="frame" id="mainFrame">
                 <svg class="gauge-svg" viewBox="0 0 400 280" xmlns="http://www.w3.org/2000/svg">
                     <defs>
@@ -259,106 +283,133 @@
 
                     <text x="45" y="225" font-size="11" fill="#ef4444" text-anchor="middle" font-weight="bold">S.SELL</text>
                     <text x="45" y="240" font-size="10" fill="#7f1d1d" text-anchor="middle" font-weight="bold">90%</text>
-                    
                     <text x="45" y="105" font-size="11" fill="#ff9f43" text-anchor="middle" font-weight="bold">SELL</text>
                     <text x="200" y="30" font-size="11" fill="#a4b0be" text-anchor="middle" font-weight="bold">NEUTRAL</text>
                     <text x="355" y="105" font-size="11" fill="#3b82f6" text-anchor="middle" font-weight="bold">BUY</text>
-                    
                     <text x="355" y="225" font-size="11" fill="#2ecc71" text-anchor="middle" font-weight="bold">S.BUY</text>
                     <text x="355" y="240" font-size="10" fill="#14532d" text-anchor="middle" font-weight="bold">90%</text>
 
-                    <!-- Card -->
                     <g transform="translate(0, 10)">
                         <rect x="120" y="220" width="160" height="50" rx="12" fill="url(#cardGradient)" stroke="#333" stroke-width="1" filter="url(#dropShadow)"/>
                         <path d="M 130 221 L 270 221" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-linecap="round"/>
-                        
                         <text id="asset-text" x="200" y="240" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="bold" letter-spacing="1">WAITING...</text>
                         <line x1="198" y1="248" x2="198" y2="265" stroke="#444" stroke-width="1" />
-                        
                         <text id="time-text" x="160" y="260" font-size="13" fill="#9ca3af" text-anchor="middle" class="digital-font">-- M</text>
                         <text id="percent-text" x="240" y="260" font-size="13" fill="#9ca3af" text-anchor="middle" class="digital-font">--%</text>
                     </g>
                 </svg>
             </div>
 
-            <!-- Social Media Icons -->
-            <div class="social-container">
-                <a href="#" class="social-btn insta"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="social-btn tiktok"><i class="fab fa-tiktok"></i></a>
-                <a href="#" class="social-btn telegram"><i class="fab fa-telegram-plane"></i></a>
+            <div class="social-wrapper">
+                <div class="follow-text">Follow us for updates & more bots:</div>
+                <div class="social-icons">
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-tiktok"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-telegram-plane"></i></a>
+                </div>
             </div>
 
-            <!-- Developer Credit -->
-            <div class="dev-credit">Developed by <span>BADI SALAH</span></div>
+            <div class="risk-warning">
+                ⚠️ Warning: Trading involves high risk. Signals are not guaranteed. We accept no liability for any losses.
+            </div>
+
+            <div class="dev-credit">Developed by <span class="dev-name">BADI SALAH</span></div>
 
         </div>
 
-        <!-- PAGE 2: HISTORY -->
+        <!-- === PAGE 2: HISTORY (Distinct) === -->
         <div id="history-page">
-            <div class="history-title">Trading History</div>
-            <table id="history-table">
-                <thead>
-                    <tr>
-                        <th>Asset</th>
-                        <th>Dir</th>
-                        <th>Time</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Results populated by JS -->
-                </tbody>
-            </table>
+            <div class="history-header">
+                <div class="history-title"><i class="fas fa-list-ul"></i> Trading Logs</div>
+            </div>
+
+            <div class="table-container">
+                <table id="history-table">
+                    <thead>
+                        <tr>
+                            <th>Asset</th>
+                            <th>Dir</th>
+                            <th>Time</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Buttons -->
+            <div class="pagination">
+                <button class="btn-nav" id="prev-btn" onclick="changePage(-1)" disabled>Previous</button>
+                <span class="page-info" id="page-info">Page 1</span>
+                <button class="btn-nav" id="next-btn" onclick="changePage(1)">Next</button>
+            </div>
+            
+            <!-- Developer Credit in History Page too -->
+            <div class="dev-credit" style="text-align: center; margin-top: 10px;">Developed by <span class="dev-name">BADI SALAH</span></div>
         </div>
 
     </div>
 
-    <!-- BOTTOM NAVIGATION -->
+    <!-- NAVIGATION BAR -->
     <div class="nav-bar">
         <div class="nav-item active" onclick="switchPage('gauge')">
-            <i class="fas fa-radar"></i>
-            <span class="nav-label">Signals</span>
+            <i class="fas fa-gauge-high"></i>
+            <span class="nav-label">Indicator</span>
         </div>
         <div class="nav-item" onclick="switchPage('history')">
-            <i class="fas fa-clipboard-list"></i>
-            <span class="nav-label">History</span>
+            <i class="fas fa-chart-line"></i>
+            <span class="nav-label">Results</span>
         </div>
     </div>
 
     <script>
-        const USE_API = false; // Set to TRUE for real API
+        const USE_API = false; 
         const API_URL = "https://your-api.com/signals";
 
-        // Elements
+        // --- Elements ---
+        const gaugePage = document.getElementById('gauge-page');
+        const historyPage = document.getElementById('history-page');
+        const navItems = document.querySelectorAll('.nav-item');
+        const overlay = document.getElementById('start-overlay');
+        
         const needleGroup = document.getElementById('needle-group');
         const timeText = document.getElementById('time-text');
         const percentText = document.getElementById('percent-text');
         const assetText = document.getElementById('asset-text');
         const mainFrame = document.getElementById('mainFrame');
-        const historyTableBody = document.querySelector('#history-table tbody');
-        const overlay = document.getElementById('start-overlay');
         
+        // --- History & Pagination Variables ---
+        const historyTableBody = document.querySelector('#history-table tbody');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const pageInfo = document.getElementById('page-info');
+        
+        let allHistoryData = []; // Store ALL signals here
+        let currentPage = 1;
+        const rowsPerPage = 20;
+
         let audioCtx;
         let isStarted = false;
 
+        // --- Navigation ---
         function switchPage(page) {
-            const gaugePage = document.getElementById('gauge-page');
-            const historyPage = document.getElementById('history-page');
-            const navItems = document.querySelectorAll('.nav-item');
-
             if (page === 'gauge') {
                 gaugePage.style.display = 'flex';
                 historyPage.style.display = 'none';
                 navItems[0].classList.add('active');
                 navItems[1].classList.remove('active');
             } else {
-                gaugePage.style.display = 'block';
-                historyPage.style.display = 'block';
+                gaugePage.style.display = 'none';
+                historyPage.style.display = 'flex';
                 navItems[0].classList.remove('active');
                 navItems[1].classList.add('active');
+                renderTable(); // Refresh table when opening
             }
         }
 
+        // --- Audio ---
         async function playChimeSequence(count) {
             if (!audioCtx) return;
             for (let i = 0; i < count; i++) {
@@ -372,57 +423,47 @@
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-            
-            osc.type = 'sine'; 
-            osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
-            
+            osc.type = 'sine'; osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
             gain.gain.setValueAtTime(0, audioCtx.currentTime);
             gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.05);
             gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.0);
-
-            osc.start();
-            osc.stop(audioCtx.currentTime + 1.0);
+            osc.start(); osc.stop(audioCtx.currentTime + 1.0);
         }
 
+        // --- Core Logic ---
         async function fetchSignalData() {
             if (USE_API) {
                 try {
                     const response = await fetch(API_URL);
                     const data = await response.json();
                     processSignal(data);
-                } catch (error) {
-                    console.error("API Error", error);
-                    simulateSignal();
-                }
-            } else {
-                simulateSignal();
-            }
+                } catch (error) { simulateSignal(); }
+            } else { simulateSignal(); }
         }
 
         function simulateSignal() {
-            const assets = ["EUR/USD", "GBP/JPY", "BTC/USD", "XAU/USD"];
+            const assets = ["EUR/USD", "GBP/JPY", "BTC/USD", "XAU/USD", "AUD/CAD"];
             const durations = [1, 2, 3, 5];
-            
             let rawStrength = Math.random() * 100;
-            // Bias towards extremes for demo
             if (Math.random() > 0.4) rawStrength = rawStrength > 50 ? 85 + Math.random()*15 : 15 - Math.random()*15;
 
             const data = {
                 asset: assets[Math.floor(Math.random() * assets.length)] + " (OTC)",
                 duration: durations[Math.floor(Math.random() * durations.length)],
-                needleValue: rawStrength
+                needleValue: rawStrength,
+                timestamp: new Date()
             };
             processSignal(data);
         }
 
         function processSignal(data) {
+            // Gauge Animation
             const angle = (data.needleValue / 100 * 180) - 90;
             needleGroup.style.transform = `rotate(${angle}deg)`;
 
             let distanceFromCenter = Math.abs(data.needleValue - 50);
             let successRate = Math.round(distanceFromCenter * 1.95); 
-            if (successRate > 98) successRate = 98;
-            if (successRate < 10) successRate = 10;
+            if (successRate > 98) successRate = 98; if (successRate < 10) successRate = 10;
 
             assetText.textContent = data.asset;
             timeText.textContent = data.duration + " Min";
@@ -432,60 +473,106 @@
             percentText.setAttribute('fill', '#9ca3af');
             
             let chimeCount = 0;
-
             if (data.needleValue >= 85) {
                 mainFrame.style.borderColor = "#2ecc71";
-                percentText.setAttribute('fill', "#2ecc71");
-                chimeCount = 3; 
+                percentText.setAttribute('fill', "#2ecc71"); chimeCount = 3; 
             } else if (data.needleValue >= 60) {
-                percentText.setAttribute('fill', "#3b82f6");
-                chimeCount = 1;
+                percentText.setAttribute('fill', "#3b82f6"); chimeCount = 1;
             } else if (data.needleValue <= 15) {
                 mainFrame.style.borderColor = "#ef4444";
-                percentText.setAttribute('fill', "#ef4444");
-                chimeCount = 3;
+                percentText.setAttribute('fill', "#ef4444"); chimeCount = 3;
             } else if (data.needleValue <= 40) {
-                percentText.setAttribute('fill', "#ff9f43");
-                chimeCount = 1;
+                percentText.setAttribute('fill', "#ff9f43"); chimeCount = 1;
             } else {
                 percentText.setAttribute('fill', "#a4b0be");
             }
 
             if (chimeCount > 0) playChimeSequence(chimeCount);
 
+            // Add to history after delay
             setTimeout(() => {
-                addToHistory(data, successRate);
+                addToHistoryArray(data, successRate);
             }, 3000); 
         }
 
-        function addToHistory(data, rate) {
-            const row = document.createElement('tr');
-            let dirHTML = '<span style="color:#666">-</span>';
-            let resultHTML = '<span style="color:#666">...</span>';
-
+        // --- History Logic ---
+        function addToHistoryArray(data, rate) {
+            // Determine result (Simulated)
             const isWin = Math.random() < (rate / 100); 
+            let dir = "Neutral";
+            let res = "Pending";
+
+            if (data.needleValue > 55) { dir = "BUY"; res = isWin ? "WIN" : "LOSS"; }
+            else if (data.needleValue < 45) { dir = "SELL"; res = isWin ? "WIN" : "LOSS"; }
+
+            if(dir === "Neutral") return; // Don't log neutral
+
+            const newRecord = {
+                asset: data.asset.split(' ')[0],
+                dir: dir,
+                time: data.duration + "m",
+                res: res
+            };
+
+            // Add to beginning of array
+            allHistoryData.unshift(newRecord);
             
-            if (data.needleValue > 55) {
-                dirHTML = '<span class="buy">BUY</span>';
-                resultHTML = isWin ? '<span class="win">WIN</span>' : '<span class="loss">LOSS</span>';
-            } else if (data.needleValue < 45) {
-                dirHTML = '<span class="sell">SELL</span>';
-                resultHTML = isWin ? '<span class="win">WIN</span>' : '<span class="loss">LOSS</span>';
-            }
+            // Limit array size (optional, to keep memory low)
+            if (allHistoryData.length > 200) allHistoryData.pop();
 
-            row.innerHTML = `
-                <td>${data.asset.split(' ')[0]}</td>
-                <td>${dirHTML}</td>
-                <td>${data.duration}m</td>
-                <td>${resultHTML}</td>
-            `;
-
-            historyTableBody.insertBefore(row, historyTableBody.firstChild);
-            if (historyTableBody.children.length > 20) {
-                historyTableBody.removeChild(historyTableBody.lastChild);
-            }
+            // Refresh table if we are on page 1
+            if(currentPage === 1) renderTable();
         }
 
+        function renderTable() {
+            historyTableBody.innerHTML = "";
+            
+            // Pagination logic
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const pageItems = allHistoryData.slice(start, end);
+
+            pageItems.forEach(item => {
+                const row = document.createElement('tr');
+                
+                let dirHTML = item.dir === "BUY" 
+                    ? `<span class="buy-badge">BUY</span>` 
+                    : `<span class="sell-badge">SELL</span>`;
+                
+                let resHTML = item.res === "WIN" 
+                    ? `<span class="win-res">WIN</span>` 
+                    : `<span class="loss-res">LOSS</span>`;
+
+                row.innerHTML = `
+                    <td>${item.asset}</td>
+                    <td>${dirHTML}</td>
+                    <td>${item.time}</td>
+                    <td>${resHTML}</td>
+                `;
+                historyTableBody.appendChild(row);
+            });
+
+            // Fill empty rows if needed (to keep layout stable)
+            if(pageItems.length < rowsPerPage) {
+                for(let i=0; i < (rowsPerPage - pageItems.length); i++){
+                     const row = document.createElement('tr');
+                     row.innerHTML = `<td>-</td><td>-</td><td>-</td><td>-</td>`;
+                     historyTableBody.appendChild(row);
+                }
+            }
+
+            // Update Controls
+            pageInfo.textContent = `Page ${currentPage}`;
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = end >= allHistoryData.length;
+        }
+
+        function changePage(direction) {
+            currentPage += direction;
+            renderTable();
+        }
+
+        // --- Init ---
         document.body.addEventListener('click', function() {
             if (!isStarted) {
                 isStarted = true;
@@ -493,6 +580,9 @@
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 fetchSignalData();
                 setInterval(fetchSignalData, 6000);
+                
+                // Init empty table
+                renderTable();
             }
         });
     </script>
