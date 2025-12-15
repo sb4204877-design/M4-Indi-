@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gauge - Fire Alarm Style</title>
+    <title>Pro Trading Gauge</title>
     <style>
         body {
             background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
@@ -14,7 +14,8 @@
             margin: 0;
             padding: 20px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            cursor: pointer; /* مؤشر للنقر */
+            cursor: pointer;
+            overflow: hidden;
         }
         
         .frame {
@@ -31,14 +32,16 @@
                 inset 0 1px 1px rgba(255,255,255,0.1),
                 inset 0 -1px 1px rgba(0,0,0,0.5);
             position: relative;
+            transition: border-color 0.5s ease, box-shadow 0.5s ease;
         }
 
+        /* توهج خفيف خلف الإطار */
         .frame::before {
             content: '';
             position: absolute;
             width: 300px;
             height: 300px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -53,15 +56,21 @@
             filter: drop-shadow(0 0 15px rgba(0,0,0,0.5));
         }
 
-        /* جعل حركة الإبرة انسيابية لتستغرق معظم الـ 5 ثواني */
+        /* حركة الإبرة ناعمة جداً */
         #needle-group {
             transition: transform 4s cubic-bezier(0.25, 1, 0.5, 1);
             transform-origin: 200px 200px;
         }
+
+        /* تنسيق النصوص الرقمية */
+        .digital-font {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <div class="frame">
+    <div class="frame" id="mainFrame">
         <svg class="gauge-svg" viewBox="0 0 400 280" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <linearGradient id="arcGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -79,12 +88,12 @@
                 </linearGradient>
 
                 <linearGradient id="cardGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#2a2a2a" stop-opacity="0.9"/>
-                    <stop offset="100%" stop-color="#111111" stop-opacity="0.95"/>
+                    <stop offset="0%" stop-color="#222" stop-opacity="0.95"/>
+                    <stop offset="100%" stop-color="#000" stop-opacity="0.98"/>
                 </linearGradient>
 
                 <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
+                    <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
                     <feMerge>
                         <feMergeNode in="coloredBlur"/>
                         <feMergeNode in="SourceGraphic"/>
@@ -104,9 +113,11 @@
                 </filter>
             </defs>
 
+            <!-- القوس الخلفي -->
             <path d="M 50 200 A 150 150 0 0 1 350 200" 
                   fill="none" stroke="#1f1f1f" stroke-width="16" stroke-linecap="round"/>
 
+            <!-- القوس الملون المشع -->
             <path d="M 50 200 A 150 150 0 0 1 350 200" 
                   fill="none" stroke="url(#arcGradient)" stroke-width="16" stroke-linecap="round"
                   filter="url(#glow)"/>
@@ -114,151 +125,135 @@
             <circle cx="200" cy="200" r="14" fill="#222" stroke="#444" stroke-width="2" filter="url(#dropShadow)"/>
             <circle cx="200" cy="200" r="6" fill="#555" />
 
-            <!-- الإبرة المتحركة -->
+            <!-- مجموعة الإبرة -->
             <g id="needle-group" filter="url(#dropShadow)">
                 <polygon points="200,200 196,110 200,95 204,110 200,200" 
                          fill="url(#needleGradient)"/>
-                <path d="M 200 200 L 200 100" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
+                <path d="M 200 200 L 200 100" stroke="rgba(255,255,255,0.6)" stroke-width="1"/>
             </g>
 
-            <!-- النصوص كما هي تماماً -->
-            <!-- LEFT -->
+            <!-- النصوص -->
             <text x="45" y="225" font-size="11" fill="#ef4444" text-anchor="middle" font-weight="bold" style="text-shadow: 0 0 5px rgba(239,68,68,0.4)">STRONG SELL</text>
             <text x="45" y="240" font-size="10" fill="#7f1d1d" text-anchor="middle" font-weight="bold">90%</text>
             
-            <text x="45" y="105" font-size="11" fill="#ff9f43" text-anchor="middle" font-weight="bold" style="text-shadow: 0 0 5px rgba(255,159,67,0.4)">SELL</text>
+            <text x="45" y="105" font-size="11" fill="#ff9f43" text-anchor="middle" font-weight="bold">SELL</text>
             <text x="45" y="120" font-size="10" fill="#945618" text-anchor="middle" font-weight="bold">70%</text>
             
-            <!-- CENTER -->
-            <text x="200" y="30" font-size="11" fill="#a4b0be" text-anchor="middle" font-weight="bold" style="text-shadow: 0 0 5px rgba(164,176,190,0.4)">NEUTRAL</text>
+            <text x="200" y="30" font-size="11" fill="#a4b0be" text-anchor="middle" font-weight="bold">NEUTRAL</text>
             
-            <!-- RIGHT -->
-            <text x="355" y="105" font-size="11" fill="#3b82f6" text-anchor="middle" font-weight="bold" style="text-shadow: 0 0 5px rgba(59,130,246,0.4)">BUY</text>
+            <text x="355" y="105" font-size="11" fill="#3b82f6" text-anchor="middle" font-weight="bold">BUY</text>
             <text x="355" y="120" font-size="10" fill="#1e3a8a" text-anchor="middle" font-weight="bold">70%</text>
             
             <text x="355" y="225" font-size="11" fill="#2ecc71" text-anchor="middle" font-weight="bold" style="text-shadow: 0 0 5px rgba(46,204,113,0.4)">STRONG BUY</text>
             <text x="355" y="240" font-size="10" fill="#14532d" text-anchor="middle" font-weight="bold">90%</text>
 
-            <!-- البطاقة السفلية -->
+            <!-- البطاقة السفلية المحسنة -->
             <g transform="translate(0, 10)">
                 <rect x="120" y="220" width="160" height="50" rx="12" 
                       fill="url(#cardGradient)" stroke="#333" stroke-width="1"
                       filter="url(#dropShadow)"/>
                 
-                <path d="M 130 221 L 270 221" stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-linecap="round"/>
+                <path d="M 130 221 L 270 221" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-linecap="round"/>
 
-                <text x="200" y="242" font-size="13" fill="#ffffff" text-anchor="middle" font-weight="bold" letter-spacing="1">USD/TRY (OTC)</text>
+                <!-- اسم العملة -->
+                <text x="200" y="240" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="bold" letter-spacing="1">USD/TRY (OTC)</text>
                 
-                <circle cx="155" cy="256" r="3" fill="#3b82f6" filter="url(#glow)"/>
-                <text id="dynamic-value" x="200" y="260" font-size="14" fill="#9ca3af" text-anchor="middle" font-family="'Courier New', monospace" font-weight="bold">System Ready</text>
+                <!-- خط فاصل خفيف -->
+                <line x1="198" y1="248" x2="198" y2="265" stroke="#444" stroke-width="1" />
+
+                <!-- التوقيت (اليسار) -->
+                <text id="time-text" x="160" y="260" font-size="13" fill="#9ca3af" text-anchor="middle" class="digital-font">5 Min</text>
+
+                <!-- النسبة المئوية (اليمين) -->
+                <text id="percent-text" x="240" y="260" font-size="13" fill="#9ca3af" text-anchor="middle" class="digital-font">0%</text>
             </g>
         </svg>
     </div>
 
     <script>
         const needleGroup = document.getElementById('needle-group');
-        const valueText = document.getElementById('dynamic-value');
+        const timeText = document.getElementById('time-text');
+        const percentText = document.getElementById('percent-text');
+        const mainFrame = document.getElementById('mainFrame');
         let audioCtx;
         let isStarted = false;
 
-        // دالة توليد صوت متقطع (إنذار) لمدة 5 ثواني
-        function playIntermittentAlarm() {
+        // دالة الصوت الجميل (رنين الجرس)
+        function playPleasantBell(type) {
             if (!audioCtx) return;
 
-            const startTime = audioCtx.currentTime;
-            const duration = 5.0;  // المدة الكلية
-            const beepDuration = 0.4; // مدة الصفارة الواحدة
-            const gapDuration = 0.4;  // الصمت بين الصفارات
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
 
-            // إنشاء تكرار للصفارات
-            for (let t = 0; t < duration; t += (beepDuration + gapDuration)) {
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
 
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-
-                // نوع الصوت: Square يعطي صوت حاد يشبه الأجهزة الإلكترونية/الإنذار
-                oscillator.type = 'square';
-                // التردد: 880 هرتز (صوت تنبيهي واضح)
-                oscillator.frequency.setValueAtTime(880, startTime + t);
-
-                // التحكم في الصوت (تشغيل وإيقاف)
-                gainNode.gain.setValueAtTime(0.05, startTime + t); // مستوى الصوت
-                gainNode.gain.setValueAtTime(0, startTime + t + beepDuration);
-
-                oscillator.start(startTime + t);
-                oscillator.stop(startTime + t + beepDuration);
+            // موجة جيبية لنغمة نقية (Sine Wave)
+            oscillator.type = 'sine';
+            
+            // التردد: نغمة عالية (شراء) أو منخفضة قليلاً (بيع)
+            if (type === 'buy') {
+                oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
+            } else {
+                oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5 note (للحالة الحمراء)
             }
+
+            // التحكم في الصوت (ظهور سريع وتلاشي بطيء)
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05); // ضربة الجرس
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5); // تلاشي
+
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 2.0); // توقف كامل
         }
 
-        function triggerUpdate() {
-            // 1. تحديد المنطقة عشوائياً (ليست مجرد رقم عشوائي، بل استهداف للمناطق)
-            const zones = ['StrongSell', 'Sell', 'Neutral', 'Buy', 'StrongBuy'];
-            // اختيار منطقة عشوائية
-            const targetZone = zones[Math.floor(Math.random() * zones.length)];
+        function updateSimulation() {
+            // اختيار نسبة مئوية عشوائية (0 - 100)
+            // سنزيد احتمالية ظهور الحالات القصوى قليلاً للتجربة
+            let percent = Math.floor(Math.random() * 101);
             
-            let angle = 0;
-            let percent = 50;
-
-            // تحديد الزاوية بناءً على المنطقة المختارة لتشير الإبرة بدقة
-            switch(targetZone) {
-                case 'StrongSell': 
-                    // الزاوية من -90 إلى -60 (تقريباً)
-                    percent = Math.random() * 15; // 0% - 15%
-                    angle = -90 + (Math.random() * 30); 
-                    break;
-                case 'Sell':
-                    // الزاوية من -60 إلى -20
-                    percent = 15 + Math.random() * 25; // 15% - 40%
-                    angle = -60 + (Math.random() * 40);
-                    break;
-                case 'Neutral':
-                    // حول الصفر
-                    percent = 40 + Math.random() * 20; // 40% - 60%
-                    angle = -20 + (Math.random() * 40);
-                    break;
-                case 'Buy':
-                    percent = 60 + Math.random() * 25; // 60% - 85%
-                    angle = 20 + (Math.random() * 40);
-                    break;
-                case 'StrongBuy':
-                    percent = 85 + Math.random() * 15; // 85% - 100%
-                    angle = 60 + (Math.random() * 30);
-                    break;
-            }
-
-            // 2. تحريك الإبرة
+            // حساب زاوية الإبرة (-90 إلى 90)
+            const angle = (percent / 100 * 180) - 90;
             needleGroup.style.transform = `rotate(${angle}deg)`;
 
-            // 3. تحديث الرقم
-            const randomValue = (Math.random() * (90 - 10) + 10).toFixed(4);
-            valueText.textContent = `${randomValue} M`;
+            // تحديث نص النسبة المئوية
+            percentText.textContent = `${percent}%`;
 
-            // 4. تغيير اللون حسب المنطقة
-            if (targetZone.includes('Buy')) {
-                valueText.setAttribute('fill', '#4ade80');
-            } else if (targetZone.includes('Sell')) {
-                valueText.setAttribute('fill', '#f87171');
-            } else {
-                valueText.setAttribute('fill', '#9ca3af');
+            // تحديث وقت الصفقة (عشوائي بين 5 و 15 دقيقة لإعطاء حيوية)
+            const randomTime = Math.random() > 0.5 ? "5 Min" : "10 Min";
+            timeText.textContent = randomTime;
+
+            // إعادة تعيين الألوان
+            mainFrame.style.borderColor = "#333";
+            percentText.setAttribute('fill', '#9ca3af');
+            timeText.setAttribute('fill', '#9ca3af');
+
+            // المنطق: هل نشغل الصوت؟
+            // Strong Buy Zone (>= 85%)
+            if (percent >= 85) {
+                mainFrame.style.borderColor = "#2ecc71"; // إطار أخضر
+                percentText.setAttribute('fill', '#4ade80');
+                playPleasantBell('buy'); // رنين
+            } 
+            // Strong Sell Zone (<= 15%)
+            else if (percent <= 15) {
+                mainFrame.style.borderColor = "#ef4444"; // إطار أحمر
+                percentText.setAttribute('fill', '#f87171');
+                playPleasantBell('sell'); // رنين
             }
-
-            // 5. تشغيل الإنذار المتقطع
-            playIntermittentAlarm();
         }
 
-        // تشغيل النظام عند النقر
+        // تشغيل عند النقر
         document.body.addEventListener('click', function() {
             if (!isStarted) {
                 isStarted = true;
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 
-                // تشغيل فوراً
-                triggerUpdate();
+                // تشغيل أولي
+                updateSimulation();
                 
-                // ثم التكرار كل 5 ثواني
-                setInterval(triggerUpdate, 5000);
+                // تكرار كل 5 ثواني
+                setInterval(updateSimulation, 5000);
             }
         });
     </script>
